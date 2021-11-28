@@ -6,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/mmcdole/gofeed"
-	"github.com/robfig/cron/v3"
+	cron "github.com/robfig/cron/v3"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -44,7 +44,6 @@ func main() {
 		os.Exit(2)
 	}
 
-
 	_, err = fetch(config.Rss)
 
 	if err != nil {
@@ -52,11 +51,10 @@ func main() {
 		os.Exit(2)
 	}
 
-
 	updateTime = time.Now()
 
-	cron := cron.New()
-	_, err = cron.AddFunc("@every 30s", func() {
+	crons := cron.New()
+	_, err = crons.AddFunc("@every 30s", func() {
 		update(&config)
 	})
 
@@ -64,8 +62,7 @@ func main() {
 		fmt.Println("add cron failed ", err)
 		os.Exit(2)
 	}
-	cron.Start()
-
+	crons.Start()
 
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool, 1)
@@ -78,13 +75,12 @@ func main() {
 	}()
 
 	<-done
-	cron.Stop()
+	crons.Stop()
 
 }
 
-
 func update(config *Config) {
-	feed , err := fetch(config.Rss)
+	feed, err := fetch(config.Rss)
 	if err != nil {
 		fmt.Println("update rss error ", err)
 		return
@@ -102,14 +98,12 @@ func update(config *Config) {
 
 }
 
-
 func fetch(rss string) (*gofeed.Feed, error) {
 	fp := gofeed.NewParser()
 	feed, err := fp.ParseURL(rss)
 
 	return feed, err
 }
-
 
 func download(guid, link string) {
 
