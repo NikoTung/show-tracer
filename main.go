@@ -18,7 +18,7 @@ import (
 
 var configFile string
 
-var updateTime time.Time
+var updateTime = time.Now().UTC()
 
 func init() {
 	flag.StringVar(&configFile, "f", "", "the config file location.")
@@ -50,8 +50,6 @@ func main() {
 		fmt.Println("can not parse the rss url ", err)
 		os.Exit(2)
 	}
-
-	updateTime = time.Now()
 
 	crons := cron.New()
 	_, err = crons.AddFunc("@every 30s", func() {
@@ -86,9 +84,7 @@ func update(config *Config) {
 		return
 	}
 
-	updateTime = time.Now()
-
-	fmt.Println("update at ", updateTime)
+	updateTime = time.Now().UTC()
 
 	for _, item := range feed.Items {
 		if updateTime.Before(*item.PublishedParsed) {
