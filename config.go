@@ -8,10 +8,10 @@ type Config struct {
 }
 
 type Aria2 struct {
-	Jsonrpc string   `json:"jsonrpc"`
-	Method  string   `json:"method"`
-	Id      string   `json:"id"`
-	Params  []string `json:"params"`
+	Jsonrpc string     `json:"jsonrpc"`
+	Method  string     `json:"method"`
+	Id      string     `json:"id"`
+	Params  [][]string `json:"params"`
 }
 
 func NewAria2(id string, links string) *Aria2 {
@@ -20,6 +20,6 @@ func NewAria2(id string, links string) *Aria2 {
 		Jsonrpc: "2.0",
 		Method:  "aria2.addUri",
 		Id:      id,
-		Params:  []string{links},
+		Params:  [][]string{{links}},
 	}
 }

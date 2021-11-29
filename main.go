@@ -84,13 +84,14 @@ func update(config *Config) {
 		return
 	}
 
-	updateTime = time.Now().UTC()
-
 	for _, item := range feed.Items {
+		fmt.Println("date ", updateTime, *item.PublishedParsed)
 		if updateTime.Before(*item.PublishedParsed) {
-			go download(item.GUID, item.Link)
+			go download(item.GUID, item.Link, config.Api)
 		}
 	}
+
+	updateTime = time.Now().UTC()
 
 }
 
@@ -101,7 +102,7 @@ func fetch(rss string) (*gofeed.Feed, error) {
 	return feed, err
 }
 
-func download(guid, link string) {
+func download(guid, link, api string) {
 
 	b := NewAria2(guid, link)
 
@@ -109,7 +110,7 @@ func download(guid, link string) {
 
 	bb := bytes.NewReader(body)
 
-	req, err := http.NewRequest("POST", "http://localhost:6800/jsonrpc", bb)
+	req, err := http.NewRequest("POST", api, bb)
 	if err != nil {
 		fmt.Println("new request error ", err)
 	}
