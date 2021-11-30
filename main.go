@@ -85,7 +85,6 @@ func update(config *Config) {
 	}
 
 	for _, item := range feed.Items {
-		fmt.Println("date ", updateTime, *item.PublishedParsed)
 		if updateTime.Before(*item.PublishedParsed) {
 			go download(item.GUID, item.Link, config.Api)
 		}
