@@ -5,6 +5,8 @@ type Config struct {
 	Since string `json:"since"`
 	Dt    string `json:"dt"`
 	Api   string `json:"api"`
+	TelegramToken string `json:"telegram_token"`
+	TelegramChatId string `json:"telegram_chat_id"`
 }
 
 type Aria2 struct {

@@ -10,8 +10,10 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -52,7 +54,7 @@ func main() {
 	}
 
 	crons := cron.New()
-	_, err = crons.AddFunc("@every 30s", func() {
+	_, err = crons.AddFunc("@every 10m", func() {
 		update(&config)
 	})
 
@@ -86,7 +88,9 @@ func update(config *Config) {
 
 	for _, item := range feed.Items {
 		if updateTime.Before(*item.PublishedParsed) {
+			fmt.Println("Download ", item.Title)
 			go download(item.GUID, item.Link, config.Api)
+			go sendToTelegram(item.Title, config)
 		}
 	}
 
@@ -126,4 +130,27 @@ func download(guid, link, api string) {
 			fmt.Println("Close response error ", err)
 		}
 	}(resp.Body)
+}
+
+func sendToTelegram(name string, config *Config)  {
+	params := url.Values{}
+	params.Add("text", fmt.Sprintf("Show %s submit to download.", name))
+	params.Add("chat_id", config.TelegramChatId)
+	body := strings.NewReader(params.Encode())
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", config.TelegramToken), body)
+	if err != nil {
+		// handle err
+		fmt.Println("create request error")
+		return
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println("Send message to telegram error")
+		return
+	}
+	defer resp.Body.Close()
+
 }
