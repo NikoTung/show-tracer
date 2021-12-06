@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
 	"syscall"
 	"time"
@@ -86,6 +87,15 @@ func update(config *Config) {
 		return
 	}
 
+	sort.Slice(feed.Items, func(i, j int) bool {
+		itemi := feed.Items[i]
+		itemj := feed.Items[j]
+
+		//desc
+		return itemi.PublishedParsed.After(*itemj.PublishedParsed)
+	})
+
+
 	for _, item := range feed.Items {
 		if updateTime.Before(*item.PublishedParsed) {
 			fmt.Println("Download ", item.Title)
@@ -94,7 +104,7 @@ func update(config *Config) {
 		}
 	}
 
-	updateTime = time.Now().UTC()
+	updateTime = *feed.Items[0].PublishedParsed
 
 }
 
@@ -151,6 +161,11 @@ func sendToTelegram(name string, config *Config)  {
 		fmt.Println("Send message to telegram error")
 		return
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
 
 }
