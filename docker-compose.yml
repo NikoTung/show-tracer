@@ -1,0 +1,19 @@
+version: 3.5
+services:
+  show-tracer:
+    image: show-tracer:latest
+    volumes:
+      - ./config.json:/go/app/config.json
+    networks:
+      - aria2-network
+
+  aria2-web:
+    image: yourname/webui-aria2
+
+  rclone:
+    image: rclone/rclone-webui
+
+
+networks:
+  aria2-network:
+    name: custom_network
