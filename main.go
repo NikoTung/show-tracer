@@ -95,11 +95,10 @@ func update(config *Config) {
 		return itemi.PublishedParsed.After(*itemj.PublishedParsed)
 	})
 
-
 	for _, item := range feed.Items {
 		if updateTime.Before(*item.PublishedParsed) {
 			fmt.Println("Download ", item.Title)
-			go download(item.GUID, item.Link, config.Api)
+			go download(item.GUID, item.Link, config.Api, config.Secret)
 			go sendToTelegram(item.Title, config)
 		}
 	}
@@ -115,9 +114,9 @@ func fetch(rss string) (*gofeed.Feed, error) {
 	return feed, err
 }
 
-func download(guid, link, api string) {
+func download(guid, link, api string, secret string) {
 
-	b := NewAria2(guid, link)
+	b := NewAria2(guid, link, secret)
 
 	body, err := json.Marshal(b)
 
@@ -142,7 +141,7 @@ func download(guid, link, api string) {
 	}(resp.Body)
 }
 
-func sendToTelegram(name string, config *Config)  {
+func sendToTelegram(name string, config *Config) {
 	params := url.Values{}
 	params.Add("text", fmt.Sprintf("Show %s submit to download.", name))
 	params.Add("chat_id", config.TelegramChatId)
