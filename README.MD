@@ -11,6 +11,7 @@ It reads configuration from a file in the following format.
         "rss": "rss feed",
         "dt": "your download client type(eg.aria2)",
         "api": "your download client api endpoint",
+        "secret": "aria2 rpc secret",
         "telegram_token": "telegram bot token",
         "telegram_chat_id": "telegram chat id"
     }
