@@ -19,3 +19,8 @@ It reads configuration from a file in the following format.
 For the rss feed,you can use [rarbg.to](https://rarbg.to/rssdd.php),or [showrss.info](https://showrss.info/).
 
 Just build from the code `go build` then `./show-tracer -f config.json`
+
+
+### docker 
+
+    docker run -d  -v $PWD/config.json:/app/config.json --name show-tracer show-tracer:latest

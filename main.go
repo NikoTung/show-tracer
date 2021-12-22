@@ -54,6 +54,15 @@ func main() {
 		os.Exit(2)
 	}
 
+	if config.Since != "" {
+		since, err := time.Parse("2006-01-02", config.Since)
+		if err == nil {
+			updateTime = since
+		}
+	}
+
+	fmt.Println("start with config ", config)
+
 	crons := cron.New()
 	_, err = crons.AddFunc("@every 10m", func() {
 		update(&config)
