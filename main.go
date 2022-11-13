@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -51,7 +52,7 @@ func main() {
 
 	if err != nil {
 		fmt.Println("can not parse the rss url ", err)
-		os.Exit(2)
+		//os.Exit(2)
 	}
 
 	if config.Since != "" {
@@ -118,7 +119,8 @@ func update(config *Config) {
 
 func fetch(rss string) (*gofeed.Feed, error) {
 	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(rss)
+	deadline, _ := context.WithDeadline(context.Background(), time.Now().Add(3*time.Minute))
+	feed, err := fp.ParseURLWithContext(rss, deadline)
 
 	return feed, err
 }
